@@ -1,0 +1,5 @@
+﻿extend type Address {
+  "Suburb address is in."
+  suburb: Suburb!
+    @delegate(schema: "AG_Location", path: "suburbByDbId(dbId: $fields:suburbDbId)")
+}
