@@ -15,7 +15,7 @@ namespace GatewayService.ContentSchema
             var articleType = ctx.Schema.Types.Single(t => t.Name.Value == "Article");
             var fields = ctx.CollectFields(articleType as ObjectType);
 
-            return await Task.FromResult(new ArticleDto(dbId));
+            return await Task.FromResult(new ArticleDto(dbId, fields));
         }
     }
 }
