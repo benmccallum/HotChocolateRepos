@@ -1,22 +1,16 @@
 ﻿using HotChocolate;
-using HotChocolate.Configuration;
 using HotChocolate.Execution;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 using HotChocolate.Types.Relay;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
-using System.Collections.Generic;
 
 namespace Shared
 {
     public static class Extensions
     {
-        private static readonly List<Type> _commonTypes = new List<Type>
-        {
-            typeof(AddressType)
-        };
-
         public static IServiceCollection AddGraphQLCustom(this IServiceCollection services,
             Action<ISchemaBuilder>? configureSchema = null,
             Action<IQueryExecutionBuilder>? configureExecutor = null)
@@ -45,6 +39,9 @@ namespace Shared
                 services.AddGraphQL(schemaBuilder);
             }
 
+            services.RemoveAll<IIdSerializer>();
+            services.AddSingleton<IIdSerializer>(new IdSerializer(includeSchemaName: true));
+
             return services;
         }
 
@@ -56,8 +53,6 @@ namespace Shared
 
         public static ISchemaBuilder AddOurCommonGraphQLTypes(this ISchemaBuilder schemaBuilder)
         {
-            _commonTypes.ForEach(t => schemaBuilder.AddType(t));
-
             // Ensure string still defaults to StringType
             schemaBuilder.BindClrType<string, StringType>();
 
@@ -68,13 +63,6 @@ namespace Shared
 
             return schemaBuilder;
         }
-
-        public static ISchemaConfiguration AddOurCommonGraphQLTypes(this ISchemaConfiguration schemaConfig)
-        {
-            _commonTypes.ForEach(t => schemaConfig.RegisterType(t));
-            return schemaConfig;
-        }
-
 
         public static IServiceCollection AddGraphQLClient(this IServiceCollection services, string name, string apiUrl)
         {

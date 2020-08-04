@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WebApplication1.Stitching
+namespace GatewayService.Stitching
 {
     public class MergeTypesHandler : ITypeMergeHandler
     {

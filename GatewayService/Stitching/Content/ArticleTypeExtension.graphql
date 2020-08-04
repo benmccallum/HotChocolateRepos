@@ -1,0 +1,4 @@
+﻿extend type Article {
+  relatedTasks: [Task!]!
+    @delegate(schema: "AG_Task", path: "tasksByDbIds(dbIds: $fields:taskIds)")
+}

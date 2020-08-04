@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shared;
 
-namespace WebApplication1.ContentSchema
+namespace GatewayService.ContentSchema
 {
     public static class ContentServiceCollectionExtensions
     {
@@ -11,16 +11,11 @@ namespace WebApplication1.ContentSchema
             var schemaBuilder = SchemaBuilder.New()
                 .AddQueryType(d => d.Name("Query"))
                 //.AddAuthorizeDirectiveType()
-                //.EnableRelaySupport()
-                .ModifyOptions(o =>
-                {
-                    o.UseXmlDocumentation = true;
-                    //o.RemoveUnreachableTypes = true; // TODO: Re-enable once https://github.com/ChilliCream/hotchocolate/issues/1669 is fixed
-                })
+                .EnableRelaySupport()
                 // Add types
                 .AddOurCommonGraphQLTypes()
                 .AddType<ArticleType>()
-                //.AddType<ArticleTypeExtension>()
+                .AddType<ArticleQueryTypeExtensions>()
                 ;
 
             return schemaBuilder;

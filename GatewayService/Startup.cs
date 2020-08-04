@@ -1,3 +1,5 @@
+using GatewayService.ContentSchema;
+using GatewayService.TaskSchema;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -11,10 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Shared;
 using System;
 using System.IO;
-using WebApplication1.ContentSchema;
-using WebApplication1.Stitching;
 
-namespace WebApplication1
+namespace GatewayService
 {
     public class Startup
     {
@@ -38,15 +38,18 @@ namespace WebApplication1
             services.AddOurCommonGraphQLServices();
 
             var contentSchemaBuilder = services.AddContentServicesAndGetSchemaBuilder();
+            var taskSchemaBuilder = services.AddTaskServicesAndGetSchemaBuilder();
 
             services
                 .AddGraphQLSubscriptions()
                 .AddStitchedSchema(stitchingBuilder => stitchingBuilder
-                    .AddSchemaFromHttp("Supplier", _env, _config, services)
-                    .AddSchemaFromHttp("Location", _env, _config, services)
-                    .AddDirectiveMergeHandler<MergeDirectivesHandler>()
-                    .AddTypeMergeHandler<MergeTypesHandler>()
-                    .AddExtensionsFromFileForService("Shared", _env)
+                    //.AddSchemaFromHttp("Supplier", _env, _config, services)
+                    //.AddSchemaFromHttp("Location", _env, _config, services)
+                    .AddSchemaFromLocal("Content", contentSchemaBuilder, _env, services)
+                    .AddSchemaFromLocal("Task", taskSchemaBuilder, _env, services)
+                    //.AddDirectiveMergeHandler<MergeDirectivesHandler>()
+                    //.AddTypeMergeHandler<MergeTypesHandler>()
+                    //.AddExtensionsFromFileForService("Shared", _env)
                     .AddSchemaConfiguration(config =>
                     {
                         config.Options.UseXmlDocumentation = true;
@@ -55,8 +58,6 @@ namespace WebApplication1
                         config.RegisterExtendedScalarTypes();
                         //config.RegisterAuthorizeDirectiveType();
                         //config.RegisterDirective<DeprecatedDirectiveType>();
-
-                        config.AddOurCommonGraphQLTypes();
                     })
                     .AddExecutionConfiguration(executionBuilder =>
                     {
@@ -111,7 +112,7 @@ namespace WebApplication1
         public static IStitchingBuilder AddSchemaFromLocal(this IStitchingBuilder stitchingBuilder,
             string serviceName, ISchemaBuilder schemaBuilder, IWebHostEnvironment env, IServiceCollection services)
         {
-            var schemaName = serviceName.Substring(3);
+            var schemaName = $"AG_{serviceName}";
 
             stitchingBuilder.AddQueryExecutor(schemaName, sp => schemaBuilder.AddServices(sp).Create().MakeExecutable());
 
